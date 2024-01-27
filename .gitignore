@@ -1,0 +1,20 @@
+# Node.js
+node_modules/
+
+# Compiled files
+dist/
+*.js
+*.js.map
+*.d.ts
+
+# TypeScript
+*.tsbuildinfo
+
+# Editor/IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
