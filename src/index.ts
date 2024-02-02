@@ -2,15 +2,11 @@
 import { StoicIdentity } from "ic-stoic-identity";
 import { writable, get } from "svelte/store";
 import type { Writable, Readable, Updater, Subscriber, Invalidator, Unsubscriber } from "svelte/store";
-import { p2Aid } from "@ic0-computer/tools";
+import { generatePrincipal, p2Aid } from "@ic0-computer/tools";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import type { Principal } from "@dfinity/principal";
 import type { Identity } from "@dfinity/agent";
 import type { InterfaceFactory } from "@dfinity/candid/lib/cjs/idl";
-//@ts-ignore
-import { Secp256k1KeyIdentity } from '@dfinity/identity-secp256k1';
-import { mnemonicToSeedSync } from 'bip39';
-import { HDKey } from 'ethereum-cryptography/hdkey.js';
 import './typings'
 
 export type Wallet = {
@@ -278,9 +274,7 @@ class ConnectrClass implements Readable<WalletStore> {
   }
 
   async seedCreate(seedPhrase: string): Promise<void> {
-    const seed = mnemonicToSeedSync(seedPhrase);
-    const privateKey = HDKey.fromMasterSeed(seed).derive("m/44'/223'/0'/0/0").privateKey as Uint8Array;
-    const identity = Secp256k1KeyIdentity.fromSecretKey(privateKey);
+    const identity = generatePrincipal(seedPhrase).identity;
 
     // Get the current array of seed accounts from the store
     const currentSeedAccounts = get(this.store)?.seed || [];
