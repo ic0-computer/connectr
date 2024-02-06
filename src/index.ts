@@ -4,7 +4,7 @@ import { writable, get } from "svelte/store";
 import type { Writable, Readable, Updater, Subscriber, Invalidator, Unsubscriber } from "svelte/store";
 import { generatePrincipal, p2Aid } from "@ic0-computer/tools";
 import { Actor, HttpAgent } from "@dfinity/agent";
-import type { Principal } from "@dfinity/principal";
+import { Principal } from "@dfinity/principal";
 import type { Identity } from "@dfinity/agent";
 import type { InterfaceFactory } from "@dfinity/candid/lib/cjs/idl";
 import './typings'
@@ -64,7 +64,7 @@ class ConnectrClass implements Readable<WalletStore> {
   }
 
   async stoicConnect() {
-    StoicIdentity.load().then(async (identity : any) => {
+    await StoicIdentity.load().then(async (identity : any) => {
       if (identity !== false) {
         // ID is an already connected wallet!
       } else {
@@ -73,18 +73,18 @@ class ConnectrClass implements Readable<WalletStore> {
       }
 
       const accounts = JSON.parse(await identity.accounts());
+      const principal = await identity.getPrincipal();
 
       this.store.update((store) => ({
         ...store,
         stoic: {
           status: "connected",
-          principal: identity.getPrincipal(),
+          principal: principal,
           accountId: accounts[0].address,
           identity: identity,
           accounts: accounts,
         }
       }));
-
     });
   }
 
@@ -179,9 +179,8 @@ class ConnectrClass implements Readable<WalletStore> {
       });
     }
 
-
     const principal = await window.ic.plug.agent.getPrincipal();
-    const account_id = p2Aid(principal);
+    const account_id = p2Aid(principal.toString());
 
     this.store.update((store) => ({
       ...store,
@@ -281,7 +280,7 @@ class ConnectrClass implements Readable<WalletStore> {
 
     // Add the new seed identity to the array
     const updatedSeedAccounts = [...currentSeedAccounts, {
-      status: "connected" as const,  // Corrected to use specific string literals
+      status: "connected" as const,
       principal: identity.getPrincipal(),
       accountId: p2Aid(identity.getPrincipal()),
       identity: identity,
